@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using MoviesAPI.Models;
 using MoviesAPI.Data;
+using MoviesAPI.Data.Dtos;
+using AutoMapper;
 
 namespace MoviesAPI.Controllers;
 
@@ -9,14 +11,21 @@ namespace MoviesAPI.Controllers;
 public class MoviesAPIController : ControllerBase {
 
     private MovieDbContext _context;
-    public MoviesAPIController(MovieDbContext context) {
+    private IMapper _mapper;
+    public MoviesAPIController(
+        MovieDbContext context,
+        IMapper mapper) {
+
         this._context = context;
+        this._mapper = mapper;
     }
 
     [HttpPost]
-    public IActionResult AddMovie([FromBody]Movie movie) {
+    public IActionResult AddMovie([FromBody]CreateMovieDto createMovieDto) {
 
-        _context.Movies.Add(movie);
+        Movie movie = _mapper.Map<Movie>(createMovieDto);
+
+        _context.Movies?.Add(movie);
         _context.SaveChanges();
         return CreatedAtAction(nameof(Get_ID), new { movie.Id }, movie);
     }
@@ -27,18 +36,16 @@ public class MoviesAPIController : ControllerBase {
     [HttpGet("{id}")]
     public IActionResult Get_ID(int id) {
         var movie = GetMovieById(id);
-        return movie == null ? Ok(movie) : NotFound();
+        if (movie == null) return NotFound();
+
+        return Ok(_mapper.Map<ReadMovieDto>(movie));
     }
     [HttpPut("{id}")]
-    public IActionResult Put(int id, [FromBody] Movie newMovie) {
+    public IActionResult Put(int id, [FromBody] UpdateMovieDto updateMovieDto) {
         var movie = GetMovieById(id);
         if (movie == null) return NotFound(movie);
 
-        movie.Director = newMovie.Director;
-        movie.Title = newMovie.Title;
-        movie.Duration = newMovie.Duration;
-        movie.Gender = newMovie.Gender;
-
+        _mapper.Map(updateMovieDto, movie);
         _context.SaveChanges();
         return NoContent();
     }
@@ -55,8 +62,8 @@ public class MoviesAPIController : ControllerBase {
     }
 
     #region  private
-    private Movie GetMovieById(int id) {
-        return _context.Movies.FirstOrDefault(movie => movie.Id == id);
+    private Movie? GetMovieById(int id) {
+        return _context.Movies?.FirstOrDefault(movie => movie.Id == id);
     }
 
     #endregion

@@ -1,10 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace MoviesAPI.Models;
-public class Movie {
-    [Key]
-    [Required]
-    public int Id { get; set; }
+namespace MoviesAPI.Data.Dtos;
+public class CreateMovieDto {
     [Required(ErrorMessage = $"The {nameof(Title)} field is required")]
     public string? Title { get; set; }
     [Required(ErrorMessage = $"The {nameof(Director)} field is required")]

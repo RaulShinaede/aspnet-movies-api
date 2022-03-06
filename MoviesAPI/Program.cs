@@ -8,6 +8,7 @@ builder.Services.AddDbContext<MovieDbContext>(opts => opts.UseInMemoryDatabase("
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var app = builder.Build();
 

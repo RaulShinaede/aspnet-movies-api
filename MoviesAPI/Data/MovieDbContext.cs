@@ -8,5 +8,5 @@ public class MovieDbContext : DbContext {
         : base(options) {
     }
 
-    public DbSet<Movie> Movies { get; set; }
+    public DbSet<Movie>? Movies { get; set; }
 }
