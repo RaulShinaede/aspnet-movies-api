@@ -1,2 +1,2 @@
 # aspnet-movies-api
-API Rest com .NET 6
+## API de filmes simples no padrão Rest, usando o .NET 6.
