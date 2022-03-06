@@ -18,19 +18,46 @@ public class MoviesAPIController : ControllerBase {
 
         _context.Movies.Add(movie);
         _context.SaveChanges();
-        return CreatedAtAction(nameof(GetMovieById), new { movie.Id }, movie);
+        return CreatedAtAction(nameof(Get_ID), new { movie.Id }, movie);
     }
     [HttpGet]
-    public IActionResult GetMovies() {
+    public IActionResult Get() {
         return Ok(_context.Movies);
     }
     [HttpGet("{id}")]
-    public IActionResult GetMovieById(int id) {
-        var movie = _context.Movies
-            .FirstOrDefault(x => x.Id == id);
-
+    public IActionResult Get_ID(int id) {
+        var movie = GetMovieById(id);
+        return movie == null ? Ok(movie) : NotFound();
+    }
+    [HttpPut("{id}")]
+    public IActionResult Put(int id, [FromBody] Movie newMovie) {
+        var movie = GetMovieById(id);
         if (movie == null) return NotFound(movie);
 
-        return Ok(movie);
+        movie.Director = newMovie.Director;
+        movie.Title = newMovie.Title;
+        movie.Duration = newMovie.Duration;
+        movie.Gender = newMovie.Gender;
+
+        _context.SaveChanges();
+        return NoContent();
     }
+
+    [HttpDelete("{id}")]
+    public IActionResult Delete(int id) {
+        var movie = GetMovieById(id);
+        if (movie == null) return NotFound(movie);
+
+        _context.Remove(movie);
+        _context.SaveChanges();
+
+        return NoContent();
+    }
+
+    #region  private
+    private Movie GetMovieById(int id) {
+        return _context.Movies.FirstOrDefault(movie => movie.Id == id);
+    }
+
+    #endregion
 }
